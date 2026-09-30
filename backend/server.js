@@ -4,6 +4,8 @@ const express = require("express");
 const db = require("./config/firebase");
 
 const authRoutes = require("./routes/authRoutes");
+const readingsRoutes = require("./routes/readingsRoutes");
+
 const authenticateToken = require("./middleware/authMiddleware");
 
 const app = express();
@@ -11,6 +13,8 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/readings", readingsRoutes);
 
 app.get("/", (req, res) => {
     res.json({
