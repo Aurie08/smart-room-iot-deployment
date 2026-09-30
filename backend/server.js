@@ -1,9 +1,16 @@
+require("dotenv").config({ path: "../.env" });
+
 const express = require("express");
 const db = require("./config/firebase");
+
+const authRoutes = require("./routes/authRoutes");
+const authenticateToken = require("./middleware/authMiddleware");
 
 const app = express();
 
 app.use(express.json());
+
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
     res.json({
@@ -31,6 +38,14 @@ app.get("/api/firebase-test", async (req, res) => {
             message: "Firebase connection failed"
         });
     }
+});
+
+app.get("/api/protected-test", authenticateToken, (req, res) => {
+    res.json({
+        success: true,
+        message: "You accessed a protected route",
+        user: req.user
+    });
 });
 
 const PORT = 5000;
