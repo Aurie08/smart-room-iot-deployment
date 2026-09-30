@@ -54,6 +54,36 @@ const createReading = async (req, res) => {
     }
 };
 
+const getReadings = async (req, res) => {
+    try {
+        const snapshot = await db
+            .collection("readings")
+            .orderBy("recorded_at", "desc")
+            .limit(50)
+            .get();
+
+        const readings = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        res.json({
+            success: true,
+            count: readings.length,
+            data: readings
+        });
+
+    } catch (error) {
+        console.error("Get readings error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve sensor readings"
+        });
+    }
+};
+
 module.exports = {
-    createReading
+    createReading,
+    getReadings
 };
