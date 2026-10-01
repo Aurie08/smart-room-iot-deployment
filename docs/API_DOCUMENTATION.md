@@ -47,3 +47,24 @@ During local development, the backend runs at:
 
 ```text
 http://localhost:5000
+
+##  API Test Results
+
+The backend API was tested during development using PowerShell requests.
+
+| Test | Expected Result | Status |
+|---|---|---|
+| User login | JWT token generated | PASS |
+| Protected device endpoint | Registered device returned | PASS |
+| Valid sensor submission | Reading stored | PASS |
+| Retrieve all readings | Stored readings returned | PASS |
+| Device-specific readings | Correct device readings returned | PASS |
+| Invalid temperature | Request rejected | PASS |
+| Invalid humidity | Request rejected | PASS |
+| Unregistered device | Request rejected | PASS |
+| Missing JWT | Request rejected | PASS |
+| Invalid JWT | Request rejected | PASS |
+
+These tests confirm that the backend provides authentication,
+validation, device verification, persistent storage, and protected
+API access.
