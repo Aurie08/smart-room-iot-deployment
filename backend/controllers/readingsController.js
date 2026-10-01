@@ -23,16 +23,74 @@ const createReading = async (req, res) => {
                 message: "All sensor fields are required"
             });
         }
+// Convert sensor values to numbers
+        const temperatureValue = Number(temperature);
+        const humidityValue = Number(humidity);
+        const lightValue = Number(light);
+        const gasLevelValue = Number(gas_level);
 
-        // Create the reading object
+        // Check that sensor values are valid numbers
+        if (
+            !Number.isFinite(temperatureValue) ||
+            !Number.isFinite(humidityValue) ||
+            !Number.isFinite(lightValue) ||
+            !Number.isFinite(gasLevelValue)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Sensor values must be valid numbers"
+            });
+        }
+
+        // Validate sensible sensor ranges
+        if (temperatureValue < -40 || temperatureValue > 80) {
+            return res.status(400).json({
+                success: false,
+                message: "Temperature value is outside the allowed range"
+            });
+        }
+
+        if (humidityValue < 0 || humidityValue > 100) {
+            return res.status(400).json({
+                success: false,
+                message: "Humidity must be between 0 and 100"
+            });
+        }
+
+        if (lightValue < 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Light value cannot be negative"
+            });
+        }
+
+        if (gasLevelValue < 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Gas level cannot be negative"
+            });
+        }
+
+        // Make sure the device exists
+        const deviceRef = db.collection("devices").doc(device_id);
+        const deviceDoc = await deviceRef.get();
+
+        if (!deviceDoc.exists) {
+            return res.status(404).json({
+                success: false,
+                message: "Device not found"
+            });
+        }
+         // Create validated reading
         const reading = {
             device_id,
-            temperature: Number(temperature),
-            humidity: Number(humidity),
-            light: Number(light),
-            gas_level: Number(gas_level),
+            temperature: temperatureValue,
+            humidity: humidityValue,
+            light: lightValue,
+            gas_level: gasLevelValue,
             recorded_at: new Date()
         };
+
 
         // Save reading to Firestore
         const docRef = await db.collection("readings").add(reading);
