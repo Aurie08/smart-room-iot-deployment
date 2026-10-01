@@ -83,7 +83,46 @@ const getReadings = async (req, res) => {
     }
 };
 
+const getReadingsByDevice = async (req, res) => {
+    try {
+        const { device_id } = req.params;
+
+        if (!device_id) {
+            return res.status(400).json({
+                success: false,
+                message: "Device ID is required"
+            });
+        }
+
+        const snapshot = await db
+            .collection("readings")
+            .where("device_id", "==", device_id)
+            .get();
+
+        const readings = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        res.json({
+            success: true,
+            device_id,
+            count: readings.length,
+            data: readings
+        });
+
+    } catch (error) {
+        console.error("Get device readings error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve device readings"
+        });
+    }
+};
+
 module.exports = {
     createReading,
-    getReadings
+    getReadings,
+    getReadingsByDevice
 };
