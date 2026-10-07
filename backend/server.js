@@ -1,6 +1,7 @@
 require("dotenv").config({ path: "../.env" });
 
 const express = require("express");
+const path = require("path");
 const db = require("./config/firebase");
 
 const authRoutes = require("./routes/authRoutes");
@@ -10,6 +11,10 @@ const devicesRoutes = require("./routes/devicesRoutes");
 const authenticateToken = require("./middleware/authMiddleware");
 
 const app = express();
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.json());
 
@@ -23,6 +28,14 @@ app.get("/", (req, res) => {
         success: true,
         message: "Smart Room IoT Backend is running"
     });
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
+app.get("/dashboard", (req, res) => {
+    res.render("dashboard");
 });
 
 app.get("/api/firebase-test", async (req, res) => {
