@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Room IoT — Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+  <header class="navbar">
+    <h1>Smart Room IoT</h1>
+    <nav>
+      <a href="/dashboard" class="active">Dashboard</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Device information -->
+    <section class="card device-info">
+      <h2>Device Information</h2>
+      <div class="device-info-grid">
+        <div><strong>Device ID:</strong> <span id="deviceId">—</span></div>
+        <div><strong>Location:</strong> <span id="deviceLocation">—</span></div>
+        <div><strong>Status:</strong> <span id="deviceStatus" class="status-badge">—</span></div>
+      </div>
+    </section>
+
+    <!-- UI states -->
+    <div id="loadingState" class="state-message">Loading readings…</div>
+    <div id="errorState" class="state-message error" style="display:none;">
+      Could not retrieve data. Please try again.
+    </div>
+    <div id="emptyState" class="state-message empty" style="display:none;">
+      No readings available yet.
+    </div>
+
+    <!-- Sensor cards -->
+    <section class="sensor-cards" id="sensorCards" style="display:none;">
+      <div class="card sensor-card">
+        <h3>Temperature</h3>
+        <p class="value"><span id="temperature">—</span> <span class="unit">°C</span></p>
+      </div>
+      <div class="card sensor-card">
+        <h3>Humidity</h3>
+        <p class="value"><span id="humidity">—</span> <span class="unit">%</span></p>
+      </div>
+      <div class="card sensor-card">
+        <h3>Light</h3>
+        <p class="value"><span id="light">—</span></p>
+      </div>
+      <div class="card sensor-card">
+        <h3>Gas Level</h3>
+        <p class="value"><span id="gas_level">—</span></p>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="charts" id="chartsSection" style="display:none;">
+      <div class="card chart-card">
+        <h3>Temperature over time</h3>
+        <div class="chart-wrapper"><canvas id="tempChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h3>Humidity over time</h3>
+        <div class="chart-wrapper"><canvas id="humidityChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h3>Light level over time</h3>
+        <div class="chart-wrapper"><canvas id="lightChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <h3>Gas/smoke sensor level over time</h3>
+        <div class="chart-wrapper"><canvas id="gasChart"></canvas></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
