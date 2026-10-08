@@ -90,6 +90,7 @@ const createReading = async (req, res) => {
             gas_level: gasLevelValue,
             recorded_at: new Date()
         };
+        
 
 
         // Save reading to Firestore
