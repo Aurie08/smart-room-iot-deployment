@@ -194,3 +194,159 @@ Login: http://localhost:5000/login
 
 Dashboard: http://localhost:5000/dashboard (requires login)
 ```
+
+### Upload sensor data from the ESP32
+
+The ESP32 sends readings to:
+
+```http
+POST http://<your-machine-ip>:5000/api/readings
+```
+
+## API Endpoints
+Full documentation is available as a Postman Collection: docs/Smart-Room-IoT.postman_collection.json.
+
+## Quick reference
+
+Method	Endpoint	Auth	Purpose
+POST	/api/auth/login	None	Authenticate and receive a JWT
+POST	/api/auth/register	None	Register a new user (if implemented)
+POST	/api/readings	API key / device token	Upload a new sensor reading
+GET	/api/readings	Bearer JWT	Retrieve recent readings for the dashboard
+GET	/api/devices	Bearer JWT	List registered devices
+GET	/api/protected-test	Bearer JWT	Auth sanity-check endpoint
+
+## Example: Login
+Request
+```bash
+http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "password123"
+}
+Response (200 OK)
+
+json
+{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+Example: Get readings
+Request
+
+http
+GET /api/readings
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Response (200 OK)
+
+json
+{
+  "readings": [
+    {
+      "device_id": "ROOM-ESP32-01",
+      "temperature": 26.8,
+      "humidity": 61.5,
+      "light": 734,
+      "gas_level": 320,
+      "timestamp": "2026-10-08T22:15:00.000Z"
+    }
+  ]
+}
+Sensor Data Format
+The agreed JSON payload for sensor uploads is:
+
+json
+{
+  "device_id": "ROOM-ESP32-01",
+  "temperature": 26.8,
+  "humidity": 61.5,
+  "light": 734,
+  "gas_level": 320
+}
+```
+Note: gas_level is reported as a raw sensor value from the MQ-2. It is not calibrated to ppm/µg/m³ units.
+
+### Frontend Features
+The dashboard is built with EJS templates served by Express, and uses jQuery for AJAX and Chart.js for live visualization.
+
+# Login page (/login)
+Username + password form
+
+Client-side validation (non-empty fields)
+
+Loading state during authentication
+
+Error messages on failure
+
+# Dashboard (/dashboard)
+Device information panel — device ID, location, online/offline status
+
+Four sensor cards — Temperature, Humidity, Light, Gas Level
+
+Four live line charts — one per sensor, rendered with Chart.js
+
+Live polling — refreshes data every 10 seconds automatically
+
+JWT handling — token stored in localStorage, sent as Authorization: Bearer <token> on every request
+
+Automatic redirect — unauthenticated users are sent to /login; expired tokens (401) trigger the same redirect
+
+## UI states
+State	Behaviour
+Loading	Shown while readings are being retrieved
+Success	Sensor cards + charts display live data
+Empty	Message shown when API returns no readings
+Error	Message shown when the API call fails; auto-redirect on 401
+## Responsive design
+The layout adapts across three breakpoints:
+
+Desktop (>1024px): 4 sensor cards in a row, 2×2 chart grid
+
+Tablet (641–1024px): 2 sensor cards per row, charts stack vertically
+
+Mobile (<640px): single-column layout, navbar wraps
+
+## Resilience
+The system is designed to survive the following faults during the live demo without crashing the pipeline:
+
+# Fault	System response
+A sensor is unplugged	The last-known reading remains displayed; dashboard continues to poll
+A malformed payload is sent	Backend rejects with 400; dashboard shows error state and retries on next interval
+The backend is restarted	Dashboard shows error state, then recovers automatically within 10s
+The JWT expires	Dashboard detects 401, clears token, redirects to /login
+The Firebase service account key is missing	Backend boots in stub mode; frontend still renders
+
+## Git Workflow
+Each team member works on a dedicated feature branch. This keeps individual contributions clearly visible in the commit history — important for the viva and for the individual Q&A.
+
+Branch	Owner	Purpose
+main	shared	Integration branch (tagged final-submission)
+feature/backend-api	Olinda	Backend + Firebase + auth
+feature/frontend-dashboard	Ben	Frontend + dashboard UI
+hardware&documentation	Tamanda	ESP32 hardware + testing + docs
+Commit convention
+Commits use imperative, descriptive messages, e.g.:
+
+Build Smart Room dashboard layout with device info and four sensor cards
+Add responsive CSS for login, dashboard, cards and charts
+Handle missing Firebase service account key gracefully
+No commits of the form "update" or "fix stuff".
+
+## Acknowledgements
+Chart.js — https://www.chartjs.org
+
+jQuery — https://jquery.com
+
+Express.js — https://expressjs.com
+
+Firebase Admin SDK — https://firebase.google.com/docs/admin/setup
+
+EJS — https://ejs.co
+
+External tutorials or AI-assisted code fragments used during development are cited inline in the relevant source files where applicable.
+
+© 2026 — Ben Chapuma, Olinda Vashi, Tamanda Kamoto. Internet and Web Systems module, MUBAS.
+
