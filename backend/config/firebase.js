@@ -3,7 +3,12 @@ const path = require("path");
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 
-const keyPath = path.join(__dirname, "serviceAccountKey.json");
+const localKeyPath = path.join(__dirname, "serviceAccountKey.json");
+const renderKeyPath = "/etc/secrets/serviceAccountKey.json";
+
+const keyPath = fs.existsSync(renderKeyPath)
+    ? renderKeyPath
+    : localKeyPath;
 
 let db;
 
