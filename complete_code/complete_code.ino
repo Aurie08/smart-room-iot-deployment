@@ -6,7 +6,7 @@
 
 // --- Wi-Fi & API Configuration ---
 
-const char* API_ENDPOINT  = "http://10.36.227.243:5000/api/readings";
+const char* API_ENDPOINT = "http://192.168.10.87:5000/api/readings";
 
 // --- Hardware Pins (ESP32-C3 Specific) ---
 #define DHTPIN 4       // Digital Pin
