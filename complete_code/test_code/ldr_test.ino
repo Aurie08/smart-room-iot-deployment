@@ -2,7 +2,7 @@
 
 void setup() {
   Serial.begin(115200);
-  analogReadResolution(12); // Sets 0-4095 range
+  analogReadResolution(12);
 }
 
 void loop() {

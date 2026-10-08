@@ -9,18 +9,18 @@
 const char* API_ENDPOINT = "http://192.168.10.87:5000/api/readings";
 
 // --- Hardware Pins (ESP32-C3 Specific) ---
-#define DHTPIN 4       // Digital Pin
+#define DHTPIN 4       
 #define DHTTYPE DHT22
-#define LDR_PIN 0      // ADC1 Channel 0
-#define MQ2_PIN 1      // ADC1 Channel 1
+#define LDR_PIN 0      
+#define MQ2_PIN 1      
 
 // --- Object Declarations ---
 DHT dht(DHTPIN, DHTTYPE);
-const String DEVICE_ID = "ROOM-ESP32-01"; // Standardized device ID
+const String DEVICE_ID = "ROOM-ESP32-01"; 
 
 void setup() {
   Serial.begin(115200);
-  delay(2000); // Wait for USB CDC initialization on ESP32-C3
+  delay(2000); 
 
   Serial.println("\n--- ESP32-C3 Smart Room IoT Node Starting ---");
 
@@ -71,7 +71,7 @@ void loop() {
   }
 
   // 2. Build Standard JSON Payload
-  JsonDocument doc; // Supports ArduinoJson v7+
+  JsonDocument doc; 
   doc["device_id"]   = DEVICE_ID;
   doc["temperature"] = round(temp * 10.0) / 10.0;
   doc["humidity"]    = round(hum * 10.0) / 10.0;
@@ -100,7 +100,7 @@ void loop() {
     Serial.printf("❌ HTTP Error Code: %s\n", http.errorToString(httpResponseCode).c_str());
   }
 
-  http.end(); // Free network resources
+  http.end();
 
   // Send reading every 10 seconds
   delay(10000);
