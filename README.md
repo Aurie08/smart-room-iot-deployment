@@ -81,6 +81,7 @@ Readings are transmitted as JSON over HTTP from the IoT device, stored in Fireba
 ---
 
 ## Repository Structure
+```
 internet-and-web-services-iot-dashboard-design-group-2/
 ├── backend/
 │ ├── config/
@@ -108,7 +109,7 @@ internet-and-web-services-iot-dashboard-design-group-2/
 ├── package.json
 ├── package-lock.json
 └── README.md
-
+```
 
 ---
 
@@ -127,9 +128,9 @@ internet-and-web-services-iot-dashboard-design-group-2/
 
 ---
 
-## Setup Instructions
+### Setup Instructions
 
-### Prerequisites
+## Prerequisites
 
 - Node.js v18 or higher
 - npm v9 or higher
@@ -137,19 +138,19 @@ internet-and-web-services-iot-dashboard-design-group-2/
 - A Firebase project with Firestore enabled (for backend)
 - ESP32 with Arduino IDE (for hardware)
 
-### 1. Clone the repository
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/Student-Work-Classroom-Demo-MUBAS/internet-and-web-services-iot-dashboard-design-group-2.git
 cd internet-and-web-services-iot-dashboard-design-group-2
 
 ```
-### 2. Install backend dependencies
+## 2. Install backend dependencies
 ```bash
 cd backend
 npm install
 ```
-### 3. Configure Firebase credentials
+## 3. Configure Firebase credentials
 The backend uses a Firebase service account key. This file is intentionally excluded from Git (see .gitignore) because it contains secrets.
 
 Obtain serviceAccountKey.json from the Firebase Console (Project Settings → Service Accounts → Generate New Private Key).
@@ -158,7 +159,7 @@ Place it at: backend/config/serviceAccountKey.json.
 
 If this file is missing, the server still boots in stub mode and Firebase-dependent routes will return errors — useful for frontend development without needing the key.
 
-### 4. Configure environment variables
+## 4. Configure environment variables
 Create a .env file at the repository root (not inside backend/):
 ```bash
 JWT_SECRET=your_jwt_secret_here
