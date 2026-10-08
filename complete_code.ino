@@ -2,10 +2,10 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
+#include "secrets.h"
 
 // --- Wi-Fi & API Configuration ---
-const char* WIFI_SSID     = "Design Studio Office";
-const char* WIFI_PASSWORD = "Design_Studio!26";
+
 const char* API_ENDPOINT  = "http://10.36.227.243:5000/api/readings";
 
 // --- Hardware Pins (ESP32-C3 Specific) ---
@@ -87,6 +87,7 @@ void loop() {
   HTTPClient http;
   http.begin(API_ENDPOINT);
   http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-API-Key", DEVICE_API_KEY);
 
   int httpResponseCode = http.POST(jsonPayload);
 
