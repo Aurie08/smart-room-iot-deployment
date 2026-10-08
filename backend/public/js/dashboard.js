@@ -106,12 +106,30 @@ $(document).ready(function () {
     $("#gas_level").text(latest.gas_level ?? "—");
   }
 
-  function renderDevice(latest) {
-    $("#deviceId").text(latest.device_id || "ROOM-ESP32-01");
-    $("#deviceLocation").text(latest.location || "Smart Room");
-    const status = latest.status || "Online";
-    $("#deviceStatus").text(status).attr("data-status", status.toLowerCase());
+  function renderDevice(device) {
+  $("#deviceId").text(device.device_id || "—");
+  $("#deviceLocation").text(device.location || "—");
+
+  let status = "offline";
+
+  if (device.last_seen) {
+    const lastSeenTime = new Date(device.last_seen).getTime();
+    const currentTime = Date.now();
+
+    const secondsSinceLastReading =
+      (currentTime - lastSeenTime) / 1000;
+
+    // Device is considered online if a reading
+    // was received within the last 30 seconds.
+    if (secondsSinceLastReading <= 30) {
+      status = "online";
+    }
   }
+
+  $("#deviceStatus")
+    .text(status === "online" ? "Online" : "Offline")
+    .attr("data-status", status);
+}
 
   // ---------- Data loading ----------
   function loadReadings() {
@@ -122,34 +140,64 @@ $(document).ready(function () {
       method: "GET",
       headers: { Authorization: "Bearer " + token },
       success: function (response) {
-        const readings = Array.isArray(response) ? response : (response.readings || []);
+    const readings = Array.isArray(response)
+      ? response
+      : (response.data || []);
 
-        if (!readings || readings.length === 0) {
-          showEmpty();
-          return;
-        }
+    if (!readings || readings.length === 0) {
+        showEmpty();
+        return;
+    }
 
-        const latest = readings[readings.length - 1];
-        const labels = readings.map(function (r) {
-          return r.timestamp ? new Date(r.timestamp).toLocaleTimeString() : "";
-        });
+    const latest = readings[0];
 
-        renderCards(latest);
-        renderDevice(latest);
-        renderCharts(labels, readings);
-        showData();
-      },
-      error: function (xhr) {
-        if (xhr.status === 401) {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-          return;
-        }
-        showError();
-      }
+    const labels = readings.map(function (r) {
+        return r.recorded_at
+          ? new Date(r.recorded_at).toLocaleTimeString()
+          : "";
+    });
+
+    renderCards(latest);
+    renderDevice(latest);
+    renderCharts(labels, readings);
+    showData();
+},
     });
   }
+  function loadDevice() {
+  $.ajax({
+    url: "/api/devices",
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token
+    },
+
+    success: function (response) {
+      const devices = response.data || [];
+
+      if (devices.length === 0) {
+        $("#deviceId").text("—");
+        $("#deviceLocation").text("—");
+        $("#deviceStatus").text("Offline");
+       
+        return;
+      }
+
+      renderDevice(devices[0]);
+    },
+
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+    }
+  });
+}
 
   loadReadings();
+  loadDevice();
+
   setInterval(loadReadings, 10000); // live refresh every 10s
+  setInterval(loadDevice, 10000);
 });

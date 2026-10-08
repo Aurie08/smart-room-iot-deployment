@@ -82,19 +82,24 @@ const createReading = async (req, res) => {
             });
         }
          // Create validated reading
-        const reading = {
-            device_id,
-            temperature: temperatureValue,
-            humidity: humidityValue,
-            light: lightValue,
-            gas_level: gasLevelValue,
-            recorded_at: new Date()
-        };
-        
+        const recordedAt = new Date();
 
+const reading = {
+    device_id,
+    temperature: temperatureValue,
+    humidity: humidityValue,
+    light: lightValue,
+    gas_level: gasLevelValue,
+    recorded_at: recordedAt
+};
 
-        // Save reading to Firestore
-        const docRef = await db.collection("readings").add(reading);
+const docRef = await db.collection("readings").add(reading);
+
+// Update the device whenever a reading is received
+await deviceRef.update({
+    status: "online",
+    last_seen: recordedAt.toISOString()
+});
 
         res.status(201).json({
             success: true,
@@ -121,10 +126,17 @@ const getReadings = async (req, res) => {
             .limit(50)
             .get();
 
-        const readings = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        const readings = snapshot.docs.map(doc => {
+    const data = doc.data();
+
+    return {
+        id: doc.id,
+        ...data,
+        recorded_at: data.recorded_at?.toDate
+            ? data.recorded_at.toDate().toISOString()
+            : data.recorded_at
+    };
+});
 
         res.json({
             success: true,
@@ -156,12 +168,20 @@ const getReadingsByDevice = async (req, res) => {
         const snapshot = await db
             .collection("readings")
             .where("device_id", "==", device_id)
+            .limit(50)
             .get();
 
-        const readings = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+       const readings = snapshot.docs.map(doc => {
+    const data = doc.data();
+
+    return {
+        id: doc.id,
+        ...data,
+        recorded_at: data.recorded_at?.toDate
+            ? data.recorded_at.toDate().toISOString()
+            : data.recorded_at
+    };
+});
 
         res.json({
             success: true,
