@@ -132,8 +132,11 @@ $(document).ready(function () {
 }
 
   // ---------- Data loading ----------
+  let hasLoadedReadings = false;
   function loadReadings() {
+    if (!hasLoadedReadings) {
     showLoading();
+      }
 
     $.ajax({
       url: "/api/readings",
@@ -161,6 +164,7 @@ $(document).ready(function () {
     renderDevice(latest);
     renderCharts(labels, readings);
     showData();
+    hasLoadedReadings = true;
 },
     });
   }
